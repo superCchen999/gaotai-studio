@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gaotai.studio.task.TaskMapper">
+
+  <sql id="taskColumns">
+    t.id, t.user_id, t.template_id, tp.title AS template_title, t.status, t.stage,
+    t.failure_stage, t.failure_reason, t.result_url, t.created_at, t.updated_at, t.finished_at
+  </sql>
+
+  <insert id="insert">
+    INSERT INTO tasks (
+      id, user_id, template_id, status, stage, failure_stage, failure_reason,
+      result_url, created_at, updated_at, finished_at
+    ) VALUES (
+      #{id}, #{userId}, #{templateId}, #{status}, #{stage}, #{failureStage}, #{failureReason},
+      #{resultUrl}, #{createdAt}, #{updatedAt}, #{finishedAt}
+    )
+  </insert>
+
+  <insert id="insertTaskAsset">
+    INSERT INTO task_assets (task_id, asset_id, sort_index)
+    VALUES (#{taskId}, #{assetId}, #{sortIndex})
+  </insert>
+
+  <select id="findById" resultType="com.gaotai.studio.task.TaskRecord">
+    SELECT <include refid="taskColumns"/>
+    FROM tasks t
+    LEFT JOIN templates tp ON tp.id = t.template_id
+    WHERE t.id = #{id}
+  </select>
+
+  <select id="findByUserId" resultType="com.gaotai.studio.task.TaskRecord">
+    SELECT <include refid="taskColumns"/>
+    FROM tasks t
+    LEFT JOIN templates tp ON tp.id = t.template_id
+    WHERE t.user_id = #{userId}
+    ORDER BY t.created_at DESC, t.id DESC
+  </select>
+
+  <select id="findOldestPendingId" resultType="string">
+    SELECT id
+    FROM tasks
+    WHERE status = 'PENDING'
+    ORDER BY created_at ASC, id ASC
+    LIMIT 1
+  </select>
+
+  <update id="claim">
+    UPDATE tasks
+    SET status = 'PROCESSING', updated_at = #{updatedAt}
+    WHERE id = #{id} AND status = 'PENDING'
+  </update>
+
+  <update id="markStage">
+    UPDATE tasks
+    SET status = 'PROCESSING', stage = #{stage}, updated_at = #{updatedAt}
+    WHERE id = #{id} AND status = 'PROCESSING'
+  </update>
+
+  <update id="fail">
+    UPDATE tasks
+    SET status = 'FAILED',
+        stage = #{stage},
+        failure_stage = #{stage},
+        failure_reason = #{reason},
+        updated_at = #{updatedAt},
+        finished_at = #{updatedAt}
+    WHERE id = #{id} AND status = 'PROCESSING'
+  </update>
+
+  <update id="succeed">
+    UPDATE tasks
+    SET status = 'SUCCEEDED',
+        stage = #{stage},
+        result_url = #{resultUrl},
+        failure_stage = NULL,
+        failure_reason = NULL,
+        updated_at = #{updatedAt},
+        finished_at = #{updatedAt}
+    WHERE id = #{id} AND status = 'PROCESSING'
+  </update>
+
+  <select id="findAssetIds" resultType="string">
+    SELECT asset_id
+    FROM task_assets
+    WHERE task_id = #{taskId}
+    ORDER BY sort_index ASC
+  </select>
+</mapper>

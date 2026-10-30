@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gaotai.studio.asset.AssetMapper">
+
+  <insert id="insert">
+    INSERT INTO assets (
+      id, user_id, original_filename, mime_type, size_bytes, storage_name, created_at
+    ) VALUES (
+      #{id}, #{userId}, #{originalFilename}, #{mimeType}, #{sizeBytes}, #{storageName}, #{createdAt}
+    )
+  </insert>
+
+  <select id="findById" resultType="com.gaotai.studio.asset.Asset">
+    SELECT id, user_id, original_filename, mime_type, size_bytes, storage_name, created_at
+    FROM assets
+    WHERE id = #{id}
+  </select>
+</mapper>

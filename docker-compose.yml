@@ -1,0 +1,59 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: gaotai-root
+      MYSQL_DATABASE: gaotai
+      MYSQL_USER: gaotai
+      MYSQL_PASSWORD: gaotai
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backend/src/main/resources/db/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+      - ./backend/src/main/resources/db/002_seed.sql:/docker-entrypoint-initdb.d/002_seed.sql:ro
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-pgaotai-root"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  backend:
+    build: ./backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gaotai?characterEncoding=utf8&connectionTimeZone=UTC&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: gaotai
+      SPRING_DATASOURCE_PASSWORD: gaotai
+      STORAGE_ROOT: /data
+      STUDIO_SIMULATOR_API_ENABLED: "true"
+      SIMULATOR_STEP_DELAY_MS: "2000"
+      SIMULATOR_FAIL_STAGE: NONE
+    volumes:
+      - studio-data:/data
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/api/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 25s
+
+  frontend:
+    build: ./frontend
+    environment:
+      BACKEND_URL: http://backend:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  mysql-data:
+  studio-data:

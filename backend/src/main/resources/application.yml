@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: gaotai-studio
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/gaotai?characterEncoding=utf8&connectionTimeZone=UTC&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SPRING_DATASOURCE_USERNAME:gaotai}
+    password: ${SPRING_DATASOURCE_PASSWORD:gaotai}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 12MB
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: ${SERVER_PORT:8080}
+
+studio:
+  worker:
+    enabled: true
+    idle-wait-ms: 400
+  storage:
+    root: ${STORAGE_ROOT:./data}
+  simulator:
+    api-enabled: ${STUDIO_SIMULATOR_API_ENABLED:true}
+    step-delay-ms: ${SIMULATOR_STEP_DELAY_MS:2000}
+    fail-stage: ${SIMULATOR_FAIL_STAGE:NONE}
+
+logging:
+  level:
+    com.gaotai.studio: INFO
