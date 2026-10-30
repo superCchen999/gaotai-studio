@@ -3,6 +3,6 @@
   <rect x="70" y="70" width="660" height="460" rx="8" fill="#fffaf4" stroke="#1d1915" stroke-width="8"/>
   <path d="M70 360 C180 300 260 420 400 340 C540 260 620 390 730 320 L730 530 L70 530 Z" fill="#d7ebe3"/>
   <circle cx="220" cy="190" r="46" fill="#e2b15a"/>
-  <text x="96" y="250" fill="#1d1915" font-family="Palatino, serif" font-size="54">·G</text>
-  <text x="96" y="470" fill="#8a5a32" font-family="Palatino, serif" font-size="28">$  P</text>
+  <text x="96" y="250" fill="#1d1915" font-family="Microsoft YaHei, PingFang SC, sans-serif" font-size="54">???</text>
+  <text x="96" y="470" fill="#8a5a32" font-family="Microsoft YaHei, PingFang SC, sans-serif" font-size="28">????</text>
 </svg>
